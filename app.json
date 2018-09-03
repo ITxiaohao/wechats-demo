@@ -1,9 +1,9 @@
 {
-  "pages": [
-    "pages/classic/classic"
-  ],
+  "pages": ["pages/classic/classic"],
   "window": {
     "navigationBarBackgroundColor": "#00aeff",
-    "navigationBarTitleText": "星网物联"
+    "navigationBarTitleText": "星网物联",
+    "enablePullDownRefresh": true,
+    "backgroundColor": "#D80000"
   }
 }
