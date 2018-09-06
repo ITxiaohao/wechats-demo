@@ -1,22 +1,40 @@
 // pages/classic/classic.js
 // 导入封转好的 http 类
 import { ClassicModel } from '../../models/classic.js'
-let classic = new ClassicModel()
+import { LikeModel } from '../../models/like.js'
+
+let classicModel = new ClassicModel()
+let likeModel = new LikeModel()
+
 Page({
   /**
    * 页面的初始数据
    */
-  data: {},
+  data: {
+    classicData: null
+  },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    classic.getLatest(res => {
+    classicModel.getLatest(res => {
+      console.log(res)
+      // 传递数据,数据更新
       this.setData({
-        classic: res
+        classicData: res
       })
     })
+  },
+
+  onLike(event) {
+    console.log(event)
+    let behavior = event.detail.behavior
+    likeModel.like(
+      behavior,
+      this.data.classicData.id,
+      this.data.classicData.type
+    )
   },
 
   /**

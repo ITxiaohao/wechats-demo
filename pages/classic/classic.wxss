@@ -1,1 +1,17 @@
 /* pages/classic/classic.wxss */
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100rpx;
+  border-top: 1px solid #f5f5f5;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.epsoide {
+  margin-left: 20rpx;
+}
+
+.like {
+  margin-top: 6rpx;
+}
