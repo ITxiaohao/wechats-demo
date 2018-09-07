@@ -34,7 +34,7 @@
 .line::before {
   content: ' ';
   position: relative;
-  bottom: 12rpx;
+  bottom: 9rpx;
   border-right: 1rpx solid #000;
   margin: 0rpx 10rpx;
 }
