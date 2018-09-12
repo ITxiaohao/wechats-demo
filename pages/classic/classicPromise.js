@@ -22,15 +22,23 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    classicModel.getLatest(res => {
-      // 传递数据,数据更新, 用 Storage 来缓存数据
-      this.setData({
-        classicData: res,
-        likeCount: res.fav_nums,
-        likeStatus: res.like_status
+    classicModel
+      .APIFirst()
+      .then(res1 => {
+        console.log('第一次调用api返回的值', res1)
+        // 在 API 1 里调用 API 2
+        // TODO Promise 相比回调函数最大的好处是可以 return 回调函数只能传入自身来返回数据
+        return classicModel.APISecond() // 调用 APISecond 用 return 将值返回，然后用 then 来接收
       })
-      console.log('latest classic', res)
-    })
+      // then 返回第二次 api 调用的结果
+      .then(res2 => {
+        console.log('第二次调用api返回的值', res2)
+        return classicModel.APIThird()
+      })
+      //  then 返回第三次 api 调用的结果
+      .then(res3 => {
+        console.log('第三次调用api返回的值', res3)
+      })
   },
 
   onLike(event) {
