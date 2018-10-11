@@ -6,5 +6,13 @@
     "navigationBarTitleText": "林间小屋",
     "enablePullDownRefresh": true,
     "backgroundColor": "#fff"
+  },
+  "tabBar": {
+    "list": [
+      {
+        "text": "流行",
+        "iconPath": ""
+      }
+    ]
   }
 }
