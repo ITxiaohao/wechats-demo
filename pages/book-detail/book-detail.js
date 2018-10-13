@@ -20,30 +20,26 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
+    wx.showLoading({
+      title: 'Loading...', //提示的内容,
+      mask: true //显示透明蒙层，防止触摸穿透,
+    })
     // id  页面如何接收外部传递的参数
     const bid = options.bid
-    console.log(bid)
     const detail = bookModel.getDetail(bid)
     const comments = bookModel.getComments(bid)
     const likeStatus = bookModel.getLikeStatus(bid)
 
-    detail.then(res => {
+    // 返回一个新的 promise ，相当于是所有promise的合体
+    Promise.all([detail, comments, likeStatus]).then(res => {
+      console.log(res)
       this.setData({
-        book: res
+        book: res[0],
+        comments: res[1].comments,
+        likeStatus: res[2].like_status,
+        likeCount: res[2].fav_nums
       })
-    })
-
-    comments.then(res => {
-      this.setData({
-        comments: res.comments
-      })
-    })
-
-    likeStatus.then(res => {
-      this.setData({
-        likeStatus: res.like_status,
-        likeCount: res.fav_nums
-      })
+      wx.hideLoading()
     })
   },
 
@@ -89,8 +85,6 @@ Page({
         content: comment,
         nums: 1
       })
-
-      console.log(this.data.comments[0])
 
       this.setData({
         comments: this.data.comments,
