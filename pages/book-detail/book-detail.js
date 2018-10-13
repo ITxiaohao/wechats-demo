@@ -1,6 +1,9 @@
 // pages/book-detail/book-detail.js
 import { BookModel } from '../../models/book'
+import { LikeModel } from '../../models/like.js'
+
 const bookModel = new BookModel()
+const likeModel = new LikeModel()
 Page({
   /**
    * 页面的初始数据
@@ -9,7 +12,8 @@ Page({
     comments: [],
     book: null,
     likeStatus: false,
-    likeCount: 0
+    likeCount: 0,
+    posting: false
   },
 
   /**
@@ -24,24 +28,73 @@ Page({
     const likeStatus = bookModel.getLikeStatus(bid)
 
     detail.then(res => {
-      console.log(res)
       this.setData({
         book: res
       })
     })
 
     comments.then(res => {
-      console.log(res)
       this.setData({
         comments: res.comments
       })
     })
 
     likeStatus.then(res => {
-      console.log(res)
       this.setData({
         likeStatus: res.like_status,
         likeCount: res.fav_nums
+      })
+    })
+  },
+
+  onLike(event) {
+    const like_or_cancel = event.detail.behavior
+    likeModel.like(like_or_cancel, this.data.book.id, 400)
+  },
+
+  onFakePost(e) {
+    this.setData({
+      posting: true
+    })
+  },
+
+  onCancel(e) {
+    this.setData({
+      posting: false
+    })
+  },
+
+  onPost(e) {
+    const comment = e.detail.text || e.detail.value
+
+    if (!comment) {
+      return
+    }
+
+    if (comment.length > 12) {
+      wx.showToast({
+        title: '短评最多12个字', //提示的内容,
+        icon: 'none' //图标,
+      })
+      return
+    }
+
+    bookModel.postComment(this.data.book.id, comment).then(res => {
+      wx.showToast({
+        title: '+1', //提示的内容,
+        icon: 'success' //图标,
+      })
+
+      this.data.comments.unshift({
+        content: comment,
+        nums: 1
+      })
+
+      console.log(this.data.comments[0])
+
+      this.setData({
+        comments: this.data.comments,
+        posting: false
       })
     })
   },
