@@ -1,5 +1,6 @@
 // pages/book/book.js
 import { BookModel } from '../../models/book.js'
+import { random } from '../../utils/common.js'
 
 const bookModel = new BookModel()
 
@@ -9,7 +10,8 @@ Page({
    */
   data: {
     books: [],
-    searching: false
+    searching: false,
+    more: ''
   },
 
   /**
@@ -63,7 +65,11 @@ Page({
   /**
    * 页面上拉触底事件的处理函数
    */
-  onReachBottom: function() {},
+  onReachBottom: function() {
+    this.setData({
+      more: random(16)
+    })
+  },
 
   /**
    * 用户点击右上角分享
