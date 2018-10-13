@@ -8,7 +8,8 @@ Page({
    * 页面的初始数据
    */
   data: {
-    books: []
+    books: [],
+    searching: false
   },
 
   /**
@@ -19,6 +20,18 @@ Page({
       this.setData({
         books: res
       })
+    })
+  },
+
+  onSearch(event) {
+    this.setData({
+      searching: true
+    })
+  },
+
+  onCancel(event) {
+    this.setData({
+      searching: false
     })
   },
 
