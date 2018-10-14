@@ -15,7 +15,7 @@ Component({
   properties: {
     more: {
       type: String,
-      observer: '_load_more'
+      observer: 'loadMore'
     }
   },
 
@@ -25,10 +25,9 @@ Component({
   data: {
     historyWords: [],
     hotWords: [],
-    // dataArray: [],
     searching: false,
     q: '',
-    loading: false
+    loadingCenter: false
   },
 
   // 组件的初始化生命周期
@@ -48,45 +47,75 @@ Component({
    * 组件的方法列表
    */
   methods: {
-    _load_more() {
-      console.log('加载更多')
+    loadMore() {
       if (!this.data.q) {
         return
       }
-      if (this.data.loading) {
+      if (this.isLocked()) {
         return
       }
       if (this.hasMore()) {
         // 相当于把锁给锁住
-        this.data.loading = true
-        bookModel.search(this.getCurrentStart(), this.data.q).then(res => {
-          this.setMoreData(res.books)
-          this.data.loading = false
-        })
+        this.locked()
+        bookModel.search(this.getCurrentStart(), this.data.q).then(
+          res => {
+            this.setMoreData(res.books)
+            // 解锁
+            this.unLocked()
+          },
+          () => {
+            this.unLocked() // then 方法请求失败调用，避免死锁
+          }
+        )
       }
     },
-    onCancel(event) {
-      this.triggerEvent('cancel', {}, {})
-    },
+
     onConfirm(event) {
-      this.setData({
-        searching: true
-      })
-      this.initialize()
+      this._showResult()
+      this._showLoadingCenter()
       const q = event.detail.value || event.detail.text
+      this.setData({
+        q
+      })
       bookModel.search(0, q).then(res => {
         this.setMoreData(res.books)
         this.setTotal(res.total)
-        this.setData({
-          q
-        })
         keywordModel.addToHistory(q)
+        this._hideLoadingCenter()
       })
     },
+
+    onCancel(event) {
+      this.triggerEvent('cancel', {}, {})
+      this.initialize()
+    },
+
     onDelete(event) {
+      this._closeResult()
+      this.initialize()
+    },
+
+    _showLoadingCenter() {
+      this.setData({
+        loadingCenter: true
+      })
+    },
+
+    _hideLoadingCenter() {
+      this.setData({
+        loadingCenter: false
+      })
+    },
+
+    _showResult() {
+      this.setData({
+        searching: true
+      })
+    },
+
+    _closeResult() {
       this.setData({
         searching: false,
-        // dataArray: [],
         q: ''
       })
     }
