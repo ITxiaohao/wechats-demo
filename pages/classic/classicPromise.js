@@ -73,7 +73,7 @@ Page({
   },
 
   _getLikeStatus(artID, category) {
-    likeModel.getCalssicLikeStatus(artID, category, res => {
+    likeModel.getClassicLikeStatus(artID, category, res => {
       this.setData({
         likeCount: res.fav_nums,
         likeStatus: res.like_status

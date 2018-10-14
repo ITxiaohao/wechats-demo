@@ -1,17 +1,21 @@
-// pages/classic/classic.js
-// 导入封转好的 http 类
-import { ClassicModel } from '../../models/classic.js';
-import { LikeModel } from '../../models/like.js';
+import { ClassicModel } from '../../models/classic.js'
+import { LikeModel } from '../../models/like.js'
 
-let classicModel = new ClassicModel();
-let likeModel = new LikeModel();
+const classicModel = new ClassicModel()
+const likeModel = new LikeModel()
 
-Page({
+Component({
   /**
    * 页面的初始数据
    */
+
+  properties: {
+    cid: Number,
+    type: Number
+  },
+
   data: {
-    classicData: null,
+    classic: null,
     latest: true,
     first: false,
     likeCount: 0,
@@ -21,90 +25,63 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function(options) {
-    classicModel.getLatest(res => {
-      // 传递数据,数据更新, 用 Storage 来缓存数据
-      this.setData({
-        classicData: res,
-        likeCount: res.fav_nums,
-        likeStatus: res.like_status
-      });
-      // console.log('latest classic', res)
-    });
+
+  attached(options) {
+    const cid = this.properties.cid
+    const type = this.properties.type
+    if (!cid) {
+      classicModel.getLatest(res => {
+        this.setData({
+          classic: res,
+          likeCount: res.fav_nums,
+          likeStatus: res.like_status
+        })
+      })
+    } else {
+      classicModel.getById(cid, type, res => {
+        this._getLikeStatus(res.id, res.type)
+        this.setData({
+          classic: res,
+          latest: classicModel.isLatest(res.index),
+          first: classicModel.isFirst(res.index)
+        })
+      })
+    }
   },
 
-  onLike(event) {
-    // console.log(event)
-    let behavior = event.detail.behavior;
-    likeModel.like(
-      behavior,
-      this.data.classicData.id,
-      this.data.classicData.type
-    );
-  },
+  methods: {
+    onLike: function(event) {
+      const behavior = event.detail.behavior
+      likeModel.like(behavior, this.data.classic.id, this.data.classic.type)
+    },
 
-  onNext(event) {
-    this._updateClassic('next');
-  },
+    onNext: function(event) {
+      this._updateClassic('next')
+    },
 
-  onPrevious(event) {
-    this._updateClassic('previous');
-  },
+    onPrevious: function(event) {
+      this._updateClassic('previous')
+    },
 
-  _updateClassic(nextOrPrevious) {
-    let index = this.data.classicData.index;
-    classicModel.getClassic(index, nextOrPrevious, res => {
-      console.log(res);
-      this._getLikeStatus(res.id, res.type);
-      this.setData({
-        classicData: res,
-        latest: classicModel.isLatest(res.index),
-        first: classicModel.isFirst(res.index)
-      });
-    });
-  },
+    _updateClassic: function(nextOrPrevious) {
+      const index = this.data.classic.index
+      classicModel.getClassic(index, nextOrPrevious, res => {
+        this._getLikeStatus(res.id, res.type)
+        this.setData({
+          classic: res,
+          latest: classicModel.isLatest(res.index),
+          first: classicModel.isFirst(res.index)
+        })
+      })
+    },
 
-  _getLikeStatus(artID, category) {
-    likeModel.getCalssicLikeStatus(artID, category, res => {
-      this.setData({
-        likeCount: res.fav_nums,
-        likeStatus: res.like_status
-      });
-    });
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function() {},
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function() {},
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function() {},
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function() {},
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function() {},
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function() {},
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function() {}
-});
+    _getLikeStatus: function(artID, category) {
+      likeModel.getClassicLikeStatus(artID, category, res => {
+        this.setData({
+          likeCount: res.fav_nums,
+          likeStatus: res.like_status
+        })
+      })
+    }
+  }
+})
